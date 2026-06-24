@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit configuration for ui-ux-pro-max-skill
+# Docs: https://docs.coderabbit.ai/reference/configuration
+language: "en-US"
+tone_instructions: "Be concise and pragmatic. This repo is a design-intelligence toolkit (Python stdlib scripts + a TypeScript CLI + CSV/JSON data). Prioritize correctness, the src->cli/assets sync rule, and dependency hygiene over style nits."
+early_access: false
+
+reviews:
+  # "chill" = focus on substantive issues, less nitpicking. Switch to "assertive" for deeper reviews.
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  changed_files_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  poem: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+
+  # Generated / synced / vendored paths — don't review the copies, review their source.
+  path_filters:
+    - "!cli/assets/**"
+    - "!cli/dist/**"
+    - "!**/*.lock"
+    - "!**/bun.lock"
+
+  path_instructions:
+    - path: "src/ui-ux-pro-max/scripts/**/*.py"
+      instructions: >-
+        Source of truth for search/design logic. Must stay Python 3.x
+        standard-library only (no third-party imports / no requirements).
+        Keep Windows compatibility in mind (scripts are invoked as `python` on
+        Windows, `python3` elsewhere). Flag any new external dependency.
+    - path: "src/ui-ux-pro-max/data/**/*.csv"
+      instructions: >-
+        Canonical CSV databases. Check column/header consistency, no broken
+        rows, and that quoting/escaping is valid. These are consumed by the
+        BM25 + regex search engine.
+    - path: "src/ui-ux-pro-max/templates/**"
+      instructions: >-
+        Source of truth for generated skill files. Any change here must be
+        synced into cli/assets/templates/ before publishing (see CLAUDE.md
+        "Sync Rules"). Flag changes to src templates that lack a matching
+        cli/assets update in the same PR.
+    - path: "cli/src/**/*.ts"
+      instructions: >-
+        Installer CLI (ESM, built with bun, target node). Watch for unsafe
+        filesystem writes, especially MCP config merges that could clobber a
+        user's existing .mcp.json / .cursor/mcp.json. Prefer non-destructive
+        merges.
+    - path: ".claude-plugin/**/*.json"
+      instructions: >-
+        Claude marketplace plugin manifests. Validate JSON shape and that MCP
+        server definitions never embed secrets (API keys must use ${ENV_VAR}
+        references, not literal values).
+
+chat:
+  auto_reply: true
