@@ -1,11 +1,20 @@
 {
   "name": "ui-ux-pro-max",
-  "description": "UI/UX design intelligence. 67 styles, 161 palettes, 57 font pairings, 25 charts, 15 stacks (React, Next.js, Vue, Svelte, Astro, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, Nuxt, Jetpack Compose). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient.",
+  "description": "UI/UX design intelligence. 67 styles, 161 palettes, 57 font pairings, 25 charts, 15 stacks (React, Next.js, Vue, Svelte, Astro, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, Nuxt, Jetpack Compose). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Integrations: 21st.dev Magic MCP for AI-generated React/Tailwind components.",
   "version": "2.5.0",
   "author": {
     "name": "nextlevelbuilder"
   },
   "license": "MIT",
-  "keywords": ["ui", "ux", "design", "styles", "typography", "color-palette", "accessibility", "charts", "components"],
-  "skills": ["./.claude/skills/ui-ux-pro-max"]
+  "keywords": ["ui", "ux", "design", "styles", "typography", "color-palette", "accessibility", "charts", "components", "21st-dev", "mcp"],
+  "skills": ["./.claude/skills/ui-ux-pro-max"],
+  "mcpServers": {
+    "magic": {
+      "command": "npx",
+      "args": ["-y", "@21st-dev/magic@latest"],
+      "env": {
+        "API_KEY": "${TWENTY_FIRST_API_KEY}"
+      }
+    }
+  }
 }

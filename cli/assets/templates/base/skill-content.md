@@ -27,6 +27,8 @@ sudo apt update && sudo apt install python3
 winget install Python.Python.3.12
 ```
 
+> **Note:** On Windows, use `python` instead of `python3` to run scripts (e.g., `python scripts/search.py` instead of `python3 scripts/search.py`).
+
 ---
 
 ## How to Use This Skill
@@ -138,6 +140,55 @@ Get implementation-specific best practices for the user's stack:
 ```bash
 python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack <stack>
 ```
+
+---
+
+## Integrations: 21st.dev Magic MCP (Optional)
+
+This skill decides **what** to build (style, palette, typography, UX rules). The
+[21st.dev](https://21st.dev) **Magic MCP** server (`@21st-dev/magic`) helps generate
+**the actual React/Tailwind component code** from a natural-language prompt, drawing on
+21st.dev's community component library. The two are complementary: use this skill for the
+design system, Magic MCP to scaffold the markup, then return here to verify against the
+Pre-Delivery Checklist.
+
+### When to use it
+
+- You want a polished React/Tailwind/shadcn-style component scaffolded quickly (hero, pricing card, navbar, etc.)
+- You want to browse real, production-grade component variations instead of writing from scratch
+- The target stack is web React/Next.js with Tailwind (Magic outputs Tailwind/React)
+
+> Skip it for non-web stacks (SwiftUI, Flutter, Jetpack Compose) — it emits React/Tailwind only.
+
+### One-time setup
+
+1. Get a free API key at **https://21st.dev/magic/console** (sign in with GitHub).
+2. Export it so the MCP server can read it (add to your shell profile to make it permanent):
+   ```bash
+   export TWENTY_FIRST_API_KEY="your-key-here"
+   ```
+3. Register the MCP server with your assistant. If you installed via `uipro init` for
+   **Claude Code** or **Cursor**, the config below is written automatically (into
+   `.mcp.json` / `.cursor/mcp.json`); otherwise add it manually:
+   ```json
+   {
+     "mcpServers": {
+       "magic": {
+         "command": "npx",
+         "args": ["-y", "@21st-dev/magic@latest"],
+         "env": { "API_KEY": "${TWENTY_FIRST_API_KEY}" }
+       }
+     }
+   }
+   ```
+   For Claude Code you can also run: `claude mcp add magic -e API_KEY=$TWENTY_FIRST_API_KEY -- npx -y @21st-dev/magic@latest`
+4. Restart the assistant so it picks up the new server.
+
+### Recommended workflow
+
+1. **Design system first** — run `--design-system` (Step 2) to lock the style, palette, and typography.
+2. **Scaffold with Magic** — ask the assistant for the component (e.g. *"/ui a pricing section with three tiers"*); Magic returns React/Tailwind code.
+3. **Conform to the system** — re-skin the generated component with the tokens/colors/fonts from Step 2, then run it through the Pre-Delivery Checklist and `--domain ux` validation pass.
 
 ---
 
@@ -265,9 +316,14 @@ Scope notice: The rules below are for App UI (iOS/Android/React Native/Flutter),
 
 ### Icons & Visual Elements
 
+- 默认图标库使用 **Phosphor (`@phosphor-icons/react`)**。`src/ui-ux-pro-max/data/icons.csv` 中列出的只是常用推荐图标，不是完整集合。
+- 当推荐表中找不到合适的图标时：
+  - **优先继续从 Phosphor 的完整图标集中选择任何语义更贴切的图标**；
+  - 如果 Phosphor 也没有理想选项，可以使用 **Heroicons (`@heroicons/react`)** 作为备选，注意保持风格一致（线性/填充、笔画粗细、圆角风格）。
+
 | Rule | Standard | Avoid | Why It Matters |
 |------|----------|--------|----------------|
-| **No Emoji as Structural Icons** | Use vector-based icons (e.g., Lucide, react-native-vector-icons, @expo/vector-icons). | Using emojis (🎨 🚀 ⚙️) for navigation, settings, or system controls. | Emojis are font-dependent, inconsistent across platforms, and cannot be controlled via design tokens. |
+| **No Emoji as Structural Icons** | Use vector-based icons (e.g., Phosphor `@phosphor-icons/react`, Heroicons `@heroicons/react`, react-native-vector-icons, @expo/vector-icons). | Using emojis (🎨 🚀 ⚙️) for navigation, settings, or system controls. | Emojis are font-dependent, inconsistent across platforms, and cannot be controlled via design tokens. |
 | **Vector-Only Assets** | Use SVG or platform vector icons that scale cleanly and support theming. | Raster PNG icons that blur or pixelate. | Ensures scalability, crisp rendering, and dark/light mode adaptability. |
 | **Stable Interaction States** | Use color, opacity, or elevation transitions for press states without changing layout bounds. | Layout-shifting transforms that move surrounding content or trigger visual jitter. | Prevents unstable interactions and preserves smooth motion/perceived quality on mobile. |
 | **Correct Brand Logos** | Use official brand assets and follow their usage guidelines (spacing, color, clear space). | Guessing logo paths, recoloring unofficially, or modifying proportions. | Prevents brand misuse and ensures legal/platform compliance. |

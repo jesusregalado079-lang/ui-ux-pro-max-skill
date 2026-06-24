@@ -143,6 +143,55 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack <stack>
 
 ---
 
+## Integrations: 21st.dev Magic MCP (Optional)
+
+This skill decides **what** to build (style, palette, typography, UX rules). The
+[21st.dev](https://21st.dev) **Magic MCP** server (`@21st-dev/magic`) helps generate
+**the actual React/Tailwind component code** from a natural-language prompt, drawing on
+21st.dev's community component library. The two are complementary: use this skill for the
+design system, Magic MCP to scaffold the markup, then return here to verify against the
+Pre-Delivery Checklist.
+
+### When to use it
+
+- You want a polished React/Tailwind/shadcn-style component scaffolded quickly (hero, pricing card, navbar, etc.)
+- You want to browse real, production-grade component variations instead of writing from scratch
+- The target stack is web React/Next.js with Tailwind (Magic outputs Tailwind/React)
+
+> Skip it for non-web stacks (SwiftUI, Flutter, Jetpack Compose) — it emits React/Tailwind only.
+
+### One-time setup
+
+1. Get a free API key at **https://21st.dev/magic/console** (sign in with GitHub).
+2. Export it so the MCP server can read it (add to your shell profile to make it permanent):
+   ```bash
+   export TWENTY_FIRST_API_KEY="your-key-here"
+   ```
+3. Register the MCP server with your assistant. If you installed via `uipro init` for
+   **Claude Code** or **Cursor**, the config below is written automatically (into
+   `.mcp.json` / `.cursor/mcp.json`); otherwise add it manually:
+   ```json
+   {
+     "mcpServers": {
+       "magic": {
+         "command": "npx",
+         "args": ["-y", "@21st-dev/magic@latest"],
+         "env": { "API_KEY": "${TWENTY_FIRST_API_KEY}" }
+       }
+     }
+   }
+   ```
+   For Claude Code you can also run: `claude mcp add magic -e API_KEY=$TWENTY_FIRST_API_KEY -- npx -y @21st-dev/magic@latest`
+4. Restart the assistant so it picks up the new server.
+
+### Recommended workflow
+
+1. **Design system first** — run `--design-system` (Step 2) to lock the style, palette, and typography.
+2. **Scaffold with Magic** — ask the assistant for the component (e.g. *"/ui a pricing section with three tiers"*); Magic returns React/Tailwind code.
+3. **Conform to the system** — re-skin the generated component with the tokens/colors/fonts from Step 2, then run it through the Pre-Delivery Checklist and `--domain ux` validation pass.
+
+---
+
 ## Search Reference
 
 ### Available Domains

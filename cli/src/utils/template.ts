@@ -7,6 +7,20 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // After bun build: dist/index.js -> ../assets = cli/assets ✓
 const ASSETS_DIR = join(__dirname, '..', 'assets');
 
+export interface McpServerConfig {
+  command: string;
+  args: string[];
+  env?: Record<string, string>;
+}
+
+export interface McpConfig {
+  // Path (relative to the install target) of the MCP config file to write/merge.
+  configPath: string;
+  // Key under "mcpServers" to register the server as.
+  serverKey: string;
+  server: McpServerConfig;
+}
+
 export interface PlatformConfig {
   platform: string;
   displayName: string;
@@ -21,6 +35,7 @@ export interface PlatformConfig {
   sections: {
     quickReference: boolean;
   };
+  mcp?: McpConfig;
   title: string;
   description: string;
   skillOrWorkflow: string;
@@ -180,6 +195,43 @@ async function copyDataAndScripts(targetSkillDir: string): Promise<void> {
 }
 
 /**
+ * Write or merge the 21st.dev Magic MCP server into the platform's MCP config file.
+ *
+ * - Creates the config file (and parent dirs) if it does not exist.
+ * - Merges into an existing `mcpServers` map without clobbering other servers.
+ * - Never overwrites an entry the user already defined under the same key.
+ *
+ * Returns the relative config path if written/updated, or null if skipped.
+ */
+async function writeMcpConfig(baseDir: string, mcp: McpConfig): Promise<string | null> {
+  const targetPath = join(baseDir, mcp.configPath);
+
+  let existing: { mcpServers?: Record<string, unknown> } = {};
+  if (await exists(targetPath)) {
+    try {
+      existing = JSON.parse(await readFile(targetPath, 'utf-8'));
+    } catch {
+      // Malformed config — don't risk corrupting it, leave it for the user.
+      console.log(`  Skipped MCP setup: ${mcp.configPath} exists but is not valid JSON`);
+      return null;
+    }
+  }
+
+  const servers = (existing.mcpServers ??= {});
+  if (Object.prototype.hasOwnProperty.call(servers, mcp.serverKey)) {
+    // Respect an existing user-defined server with the same key.
+    return null;
+  }
+
+  servers[mcp.serverKey] = mcp.server;
+
+  await mkdir(dirname(targetPath), { recursive: true });
+  await writeFile(targetPath, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
+
+  return mcp.configPath;
+}
+
+/**
  * Generate platform files for a specific AI type
  * All platforms use self-contained installation with data and scripts
  * When isGlobal=true, installs to ~/home directory with absolute script paths
@@ -221,6 +273,14 @@ export async function generatePlatformFiles(
 
   // Copy data and scripts into the skill directory (self-contained)
   await copyDataAndScripts(skillDir);
+
+  // Wire up the 21st.dev Magic MCP server at the install root (project or home).
+  if (config.mcp) {
+    const mcpPath = await writeMcpConfig(effectiveDir, config.mcp);
+    if (mcpPath) {
+      createdFolders.push(mcpPath);
+    }
+  }
 
   return createdFolders;
 }

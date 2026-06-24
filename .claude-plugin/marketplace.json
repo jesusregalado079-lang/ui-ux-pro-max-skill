@@ -12,7 +12,7 @@
     {
       "name": "ui-ux-pro-max",
       "source": "./",
-      "description": "Professional UI/UX design intelligence for AI coding assistants. Includes searchable databases of styles, colors, typography, charts, and UX guidelines for React, Next.js, Astro, Vue, Nuxt.js, Nuxt UI, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, and Jetpack Compose.",
+      "description": "Professional UI/UX design intelligence for AI coding assistants. Includes searchable databases of styles, colors, typography, charts, and UX guidelines for React, Next.js, Astro, Vue, Nuxt.js, Nuxt UI, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, and Jetpack Compose. Bundles the 21st.dev Magic MCP server for AI-generated React/Tailwind components.",
       "version": "2.5.0",
       "author": {
         "name": "nextlevelbuilder"
@@ -26,7 +26,9 @@
         "color-palette",
         "accessibility",
         "charts",
-        "components"
+        "components",
+        "21st-dev",
+        "mcp"
       ],
       "category": "design",
       "strict": false
